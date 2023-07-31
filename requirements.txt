@@ -6,3 +6,4 @@ scipy==1.11.1
 seaborn==0.12.2
 streamlit==1.25.0
 sympy==1.12
+PyGithub==1.59.0
