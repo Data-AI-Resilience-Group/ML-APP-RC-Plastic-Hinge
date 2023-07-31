@@ -9,6 +9,8 @@ from sklearn.preprocessing import StandardScaler
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 import datetime
+from github import Github
+import os
 
 base="light"
 secondaryBackgroundColor="#b1a9a9"
@@ -117,6 +119,22 @@ if st.sidebar.button("Submit"):
      z_score_scaler_X_c_C = pickle.load(f)
     with gzip.open("model_pkl/z_score_scaler_X_θpc.pgz", "r") as f:
      z_score_scaler_X_θpc = pickle.load(f)
+
+
+    # 使用PyGithub與GitHub API進行連動
+    g = Github("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")  # 替換為你的GitHub個人訪問令牌
+    repo = g.get_repo("Lipunpun/testapp")  # 替換為你的GitHub儲存庫路徑
+
+    # 下載Excel檔案
+    file_path = "輸入模型資料.xlsx"  # 替換為你的Excel檔案在GitHub中的路徑
+    content = repo.get_contents(file_path)
+    with open("輸入模型資料.xlsx", "wb") as f:
+        f.write(content.decoded_content)
+
+    file_path = "app新試體資料.xlsx"  # 替換為你的Excel檔案在GitHub中的路徑
+    content = repo.get_contents(file_path)
+    with open("app新試體資料.xlsx", "wb") as f:
+        f.write(content.decoded_content)
 
 
     df_TW = pd.read_excel("Taiwan RC Column Database.xlsx", sheet_name="Base" ,skiprows=1)
@@ -301,7 +319,14 @@ if st.sidebar.button("Submit"):
     df_newData.reset_index(drop = True ,inplace = True)
     df_newData.to_excel('app新試體資料.xlsx',sheet_name='過往預測',index=False)
 
-    
+    # 上傳更新後的Excel檔案
+    with open("app新試體資料.xlsx", "rb") as f:
+        data = f.read()
+    repo.update_file(file_path, "Update data", data, content.sha, branch="main")
+
+    # 刪除臨時檔案
+    os.remove("app新試體資料.xlsx")
+    os.remove("輸入模型資料.xlsx")
     #-----------------------------------------------------------------------
     ### 預測完成，預測結果匯出 ###
     #-----------------------------------------------------------------------
@@ -323,7 +348,5 @@ if st.sidebar.button("Submit"):
 
 
     #-----------------------------------------------------------------------
-    #開啟網頁終端機輸入:streamlit run 02Mainapp.py  
-
-    #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
+    #開啟網頁終端機輸入:streamlit run Mainapp.py  
     #-----------------------------------------------------------------------
