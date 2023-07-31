@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 import datetime
-from github import Github
+from git import Github
 import os
 
 base="light"
