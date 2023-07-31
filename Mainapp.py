@@ -119,8 +119,6 @@ if st.sidebar.button("Submit"):
      z_score_scaler_X_θpc = pickle.load(f)
 
 
-
-
     df_TW = pd.read_excel("Taiwan RC Column Database.xlsx", sheet_name="Base" ,skiprows=1)
     df_CN = pd.read_excel("PRJ-2793.xlsx", sheet_name="Base" ,skiprows=1)
     df_peer_F = pd.read_excel("PEER RC Column Database(Rectangular).xlsx", sheet_name="Flexure" ,skiprows=1)
@@ -303,6 +301,7 @@ if st.sidebar.button("Submit"):
     df_newData.reset_index(drop = True ,inplace = True)
     df_newData.to_excel('app新試體資料.xlsx',sheet_name='過往預測',index=False)
 
+    
     #-----------------------------------------------------------------------
     ### 預測完成，預測結果匯出 ###
     #-----------------------------------------------------------------------
@@ -325,4 +324,6 @@ if st.sidebar.button("Submit"):
 
     #-----------------------------------------------------------------------
     #開啟網頁終端機輸入:streamlit run 02Mainapp.py  
+
+    #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
     #-----------------------------------------------------------------------
