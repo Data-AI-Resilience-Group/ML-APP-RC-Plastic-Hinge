@@ -315,9 +315,10 @@ if st.sidebar.button("Submit"):
                   "c_S":pred_c_S,
                   "c_K":pred_c_K,
                   "c_A":pred_c_A,
-                  "θp":pred_θp,
                   "c_C":pred_c_C,
-                  "θpc":pred_θpc }
+                  "θp":pred_θp,
+                  "θpc":pred_θpc
+                   }
     Prediction = pd.DataFrame(Pred, index=[0]) 
     st.write(Prediction) #顯示預測結果
 
