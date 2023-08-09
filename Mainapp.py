@@ -250,8 +250,8 @@ if st.sidebar.button("Submit"):
 
 
     # 使用PyGithub與GitHub API進行連動
-    g = Github("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")  # 替換為你的GitHub個人訪問令牌
-    repo = g.get_repo("Lipunpun/testapp")  # 替換為你的GitHub儲存庫路徑
+    g = Github("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")  # 替換為你的GitHub個人訪問令牌
+    repo = g.get_repo("Data-AI-Resilience-Group/ML-APP-RC-Plastic-Hinge")  # 替換為你的GitHub儲存庫路徑
 
     # 下載Excel檔案
     file_path = "app輸入模型資料.xlsx"  # 替換為你的Excel檔案在GitHub中的路徑
