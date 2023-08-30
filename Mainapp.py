@@ -11,11 +11,14 @@ import math
 import pickle
 import gzip
 
-base="light"
-secondaryBackgroundColor="#b1a9a9"
-textColor="#000000"
-font="serif"
+# 設定 Streamlit 應用程式的外觀
 
+st.set_page_config(
+    page_title="Streamlit App",
+    page_icon=":smiley:",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 # st.image("picture/DataAI.jpg", caption="", use_column_width=True)
 st.write("""
@@ -23,26 +26,13 @@ st.write("""
 # AI Plastic Hinge Prediction app
 
 
-This app utilizes a collection of cyclic loading experiments on reinforced concrete columns from both domestic and international sources. 
-Through numerical simulation analysis using the finite element program OpenSees, 
-detailed nonlinear plastic hinge spring parameters are obtained. Subsequently, 
-models based on Active Learning and Random Forests are developed to predict parameters of plastic hinge hysteretic loops.
+This application harnesses a comprehensive dataset of cyclic loading experiments conducted on 475 reinforced concrete columns.
+Using numerical simulation and analysis through OpenSees, we've synthesized key geometric and material properties.
+These properties serve as inputs for predicting nonlinear plastic hinge spring parameters within the modified Ibarra-Medina-Krawinkler deterioration model (IMK model). The prediction process employs a data-driven model that combines Active Learning and Random Forest methodologies. Users can effortlessly provide input information as per the outlined description, and the application will subsequently generate the 7 essential parameters required for the IMK model.
          
 ---
          
 """)
-
-
-# # 使用列布局
-# col1, col2 = st.columns(2)  # 创建两列
-
-# # 在第一列放置照片
-# with col1:
-#     st.image("picture/DataAI.jpg", caption="照片1", use_column_width=True)
-
-# # 在第二列放置照片
-# with col2:
-#     st.image("picture/DataAI.jpg", caption="照片2", use_column_width=True)
 
 
 #-----------------------------------------------------------------------
@@ -131,7 +121,10 @@ if st.sidebar.button("Submit"):
     Mn = float(Mn)
     H = float(H)
 
-    Ag =b*h  # 混凝土柱斷面積
+    Ag = b*h  # 混凝土柱斷面積   
+    I = 1/12*b*h**3
+    E = 12000*fc**0.5
+    K = 10*6*E*I/H
 
     # 避免除以零的情況
     if Ag != 0 and fc != 0 and H !=0 and s !=0 :
@@ -250,20 +243,29 @@ if st.sidebar.button("Submit"):
 
 
     # 使用PyGithub與GitHub API進行連動
-    g = Github("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")  # 替換為你的GitHub個人訪問令牌
-    repo = g.get_repo("Data-AI-Resilience-Group/ML-APP-RC-Plastic-Hinge")  # 替換為你的GitHub儲存庫路徑
+    github_token = "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"  
+    g = Github(github_token)
+    repo = g.get_repo("Lipunpun/testapp")  
+
+    # 設定下載路徑
+    download_folder = "C:\\Users\\user\\Desktop"
 
     # 下載Excel檔案
-    file_path = "app輸入模型資料.xlsx"  # 替換為你的Excel檔案在GitHub中的路徑
-    content = repo.get_contents(file_path)
-    with open("app輸入模型資料.xlsx", "wb") as f:
+    app_file_path = "app輸入模型資料.xlsx" 
+    content = repo.get_contents(app_file_path)
+    downloaded_file_path = os.path.join(download_folder, "app輸入模型資料.xlsx")
+
+    with open(downloaded_file_path, "wb") as f:
         f.write(content.decoded_content)
 
-    file_path = "使用者匯入資料.xlsx"  # 替換為你的Excel檔案在GitHub中的路徑
-    content = repo.get_contents(file_path)
-    with open("使用者匯入資料.xlsx", "wb") as f:
-        f.write(content.decoded_content)
 
+    # 下載Excel檔案
+    user_file_path = "使用者匯入資料.xlsx"  # 替換為你的Excel檔案在GitHub中的路徑
+    content = repo.get_contents(user_file_path)
+    downloaded_file_path = os.path.join(download_folder, "使用者匯入資料.xlsx")
+
+    with open(downloaded_file_path, "wb") as f:
+        f.write(content.decoded_content)
 
     df_addNew = pd.read_excel("使用者匯入資料.xlsx", sheet_name="過往預測" )
     df_Pred = pd.read_excel("app輸入模型資料.xlsx", sheet_name="AI塑鉸預測" )
@@ -285,23 +287,23 @@ if st.sidebar.button("Submit"):
 
     df_Pred.iloc[:,[7]] = H
 
-    df_Pred.iloc[:,[9]] = fy
+    df_Pred.iloc[:,[8]] = fy
 
-    df_Pred.iloc[:,[13]] = fy_sh
+    df_Pred.iloc[:,[12]] = fy_sh
 
-    df_Pred.iloc[:,[10]] = As
+    df_Pred.iloc[:,[9]] = As
 
-    df_Pred.iloc[:,[15]] = A_sh
+    df_Pred.iloc[:,[14]] = A_sh
 
-    df_Pred.iloc[:,[11]] = tightspacing
+    df_Pred.iloc[:,[10]] = tightspacing
 
-    df_Pred.iloc[:,[12]] = non_tightspacing
+    df_Pred.iloc[:,[11]] = non_tightspacing
 
     df_Pred.iloc[:,[2]] = failuremode
 
     df_Pred.iloc[:,[5]] = Axialratio
 
-    df_Pred.iloc[:,[14]] = hook
+    df_Pred.iloc[:,[13]] = hook
 
     #-----------------------------------------------------------------------
     #預測as
@@ -319,7 +321,7 @@ if st.sidebar.button("Submit"):
     pred_as_ = randomForestModel_as.predict(Xdata_test_Scale_as).round(4)
     df_pred_as = pd.DataFrame(pred_as_, columns= ['as'])
         
-    df_Pred.iloc[:,[16]]= df_pred_as  #寫入格式    
+    df_Pred.iloc[:,[15]]= df_pred_as  #寫入格式    
     #-----------------------------------------------------------------------
     #預測c_S
     #-----------------------------------------------------------------------
@@ -337,7 +339,7 @@ if st.sidebar.button("Submit"):
     pred_c_S = randomForestModel_c_S.predict(Xdata_test_Scale_c_S).round(2)
     df_pred_c_S = pd.DataFrame(pred_c_S, columns= ['c_S'])
         
-    df_Pred.iloc[:,[17]]= df_pred_c_S  #寫入格式    
+    df_Pred.iloc[:,[16]]= df_pred_c_S  #寫入格式    
     #-----------------------------------------------------------------------
     #預測c_K
     #-----------------------------------------------------------------------
@@ -355,7 +357,7 @@ if st.sidebar.button("Submit"):
     pred_c_K = randomForestModel_c_K.predict(Xdata_test_Scale_c_K).round(4)
     df_pred_c_K = pd.DataFrame(pred_c_K, columns= ['c_K'])
         
-    df_Pred.iloc[:,[20]]= df_pred_c_K  #寫入格式      
+    df_Pred.iloc[:,[19]]= df_pred_c_K  #寫入格式      
     #-----------------------------------------------------------------------
     #預測c_A
     #-----------------------------------------------------------------------
@@ -373,7 +375,7 @@ if st.sidebar.button("Submit"):
     pred_c_A = randomForestModel_c_A.predict(Xdata_test_Scale_c_A).round(4)
     df_pred_c_A = pd.DataFrame(pred_c_A, columns= ['c_A'])
         
-    df_Pred.iloc[:,[19]]= df_pred_c_A  #寫入格式     
+    df_Pred.iloc[:,[18]]= df_pred_c_A  #寫入格式     
     #-----------------------------------------------------------------------
     #預測θp
     #-----------------------------------------------------------------------
@@ -391,7 +393,7 @@ if st.sidebar.button("Submit"):
     pred_θp = randomForestModel_θp.predict(Xdata_test_Scale_θp).round(4)
     df_pred_θp = pd.DataFrame(pred_θp, columns= ['θp'])
         
-    df_Pred.iloc[:,[21]]= df_pred_θp  #寫入格式    
+    df_Pred.iloc[:,[20]]= df_pred_θp  #寫入格式    
     #-----------------------------------------------------------------------
     #預測c_C
     #-----------------------------------------------------------------------
@@ -409,7 +411,7 @@ if st.sidebar.button("Submit"):
     pred_c_C = randomForestModel_c_C.predict(Xdata_test_Scale_c_C).round(4)
     df_pred_c_C = pd.DataFrame(pred_c_C, columns= ['c_C'])
         
-    df_Pred.iloc[:,[18]]= df_pred_c_C  #寫入格式      
+    df_Pred.iloc[:,[17]]= df_pred_c_C  #寫入格式      
     #-----------------------------------------------------------------------
     #預測_θpc
     #-----------------------------------------------------------------------
@@ -428,22 +430,26 @@ if st.sidebar.button("Submit"):
 
     df_pred_θpc = pd.DataFrame(pred_θpc, columns= ['θpc'])
         
-    df_Pred.iloc[:,[22]]= df_pred_θpc  #寫入格式      
+    df_Pred.iloc[:,[21]]= df_pred_θpc  #寫入格式      
+    df_Pred.iloc[:,[22]]= K  #寫入格式  
+
+    # 構建完整的檔案路徑
+    output_file_path = os.path.join(download_folder, user_file_path)
 
     #輸出為EXCEL
     # df_Pred.to_excel('預測.xlsx',sheet_name='預測值',index=False)
     df_newData = pd.concat([df_addNew,df_Pred],axis = 0)
     df_newData.reset_index(drop = True ,inplace = True)
-    df_newData.to_excel('使用者匯入資料.xlsx',sheet_name='過往預測',index=False)
+    df_newData.to_excel(output_file_path,sheet_name='過往預測',index=False)
 
     # 上傳更新後的Excel檔案
-    with open("使用者匯入資料.xlsx", "rb") as f:
+    with open(output_file_path, "rb") as f:
         data = f.read()
-    repo.update_file(file_path, "Update data", data, content.sha, branch="main")
+    repo.update_file("使用者匯入資料.xlsx", "Update data", data, content.sha, branch="main")
 
     # 刪除臨時檔案
-    os.remove("使用者匯入資料.xlsx")
-    os.remove("app輸入模型資料.xlsx")
+    os.remove(os.path.join(download_folder, "使用者匯入資料.xlsx"))
+    os.remove(os.path.join(download_folder, "app輸入模型資料.xlsx"))
     #-----------------------------------------------------------------------
     ### 預測完成，預測結果匯出 ###
     #-----------------------------------------------------------------------
@@ -468,6 +474,7 @@ if st.sidebar.button("Submit"):
 
     | Output         | Value        |
     | ------------------ | ------------ |
+    | Factor relating the concrete capacity to displacement ductility,K | {K} |
     | Strain hardening ratio,a_s | {pred_as_} |
     | Strength degradation rate under cyclic loading,c_S | {pred_c_S} |
     | Cyclic degradation rate after strength attenuation,c_C | {pred_c_C} |
