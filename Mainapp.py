@@ -243,12 +243,12 @@ if st.sidebar.button("Submit"):
 
 
     # 使用PyGithub與GitHub API進行連動
-    github_token = "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"  
+    github_token = "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"  
     g = Github(github_token)
-    repo = g.get_repo("Lipunpun/testapp")  
+    repo = g.get_repo("Data-AI-Resilience-Group/ML-APP-RC-Plastic-Hinge")  
 
     # 設定下載路徑
-    download_folder = "C:\\Users\\user\\Desktop"
+    download_folder = "/mount/src/ML-APP-RC-Plastic-Hinge"
 
     # 下載Excel檔案
     app_file_path = "app輸入模型資料.xlsx" 
@@ -485,6 +485,7 @@ if st.sidebar.button("Submit"):
     '''
 
     st.markdown(markdown_text)
+
 
     #-----------------------------------------------------------------------
     #開啟網頁終端機輸入:streamlit run Mainapp.py  
