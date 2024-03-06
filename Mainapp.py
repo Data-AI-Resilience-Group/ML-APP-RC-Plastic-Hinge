@@ -243,7 +243,7 @@ if st.sidebar.button("Submit"):
 
 
     # 使用PyGithub與GitHub API進行連動
-    github_token = "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"  
+    github_token = "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"  
     g = Github(github_token)
     repo = g.get_repo("Data-AI-Resilience-Group/ML-APP-RC-Plastic-Hinge")  
 
